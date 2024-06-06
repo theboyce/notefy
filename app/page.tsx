@@ -30,6 +30,7 @@ export default function Home() {
       <button onClick={handleGoogleSignIn} className="bg-blue-400">
         continue with google
       </button>
+      <p>hey</p>
     </main>
   );
 }
