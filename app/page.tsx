@@ -2,9 +2,8 @@
 
 import {
   GoogleAuthProvider,
-  signOut,
-  signInWithRedirect,
   signInWithPopup,
+  onAuthStateChanged,
 } from "firebase/auth";
 import { auth } from "./firebase";
 import { useRouter } from "next/navigation";
@@ -15,26 +14,42 @@ export default function Home() {
 
   // after the user logs in, handle the user here
   const handleGoogleSignIn = async () => {
-    const provider = new GoogleAuthProvider();
+    const googleProvider = new GoogleAuthProvider();
 
     try {
-      await signInWithPopup(auth, provider);
+      signInWithPopup(auth, googleProvider); // trigger google auth modal
+
+      // get the data for only that user
+      // const q = query(collection(db, "users"), where("uid", "==", user.uid));
+
       router.push("/notes");
     } catch (error) {
       console.log(error);
     }
   };
 
+  // when the auth state changes
+  const authChangeHandler = () => {
+    onAuthStateChanged(auth, (user) => {
+      console.log(user);
+    });
+  };
+
   return (
     <main className="h-screen bg-white flex flex-col px-8 py-6">
       <div className="font-bold">Notefy</div>
       <div className="flex flex-1 flex-col justify-center items-center gap-4">
-      <h2 className="font-bold text-[3rem] text-primary">Thoughts and Tunes Together</h2>
-      <p className="text-blueGray">Keep your notes and playlists in sync</p>
-      <button onClick={handleGoogleSignIn} className="bg-white  border border-darkBlue hover:bg-secondary hover:border hover:border-primary text-darkGray py-4 px-6 rounded-md flex items-center gap-2">
-      <FcGoogle/>
-Continue with Google
-      </button>
+        <h2 className="font-bold text-[3rem] text-primary">
+          Thoughts and Tunes Together
+        </h2>
+        <p className="text-blueGray">Keep your notes and playlists in sync</p>
+        <button
+          onClick={handleGoogleSignIn}
+          className="bg-white  border border-darkBlue hover:bg-secondary hover:border hover:border-primary text-darkGray py-4 px-6 rounded-md flex items-center gap-2"
+        >
+          <FcGoogle />
+          Continue with Google
+        </button>
       </div>
     </main>
   );
