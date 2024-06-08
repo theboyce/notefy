@@ -5,9 +5,10 @@ import {
   signInWithPopup,
   onAuthStateChanged,
 } from "firebase/auth";
-import { auth } from "./firebase";
+import { auth, db } from "./firebase";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
+import { collection, doc, setDoc } from "firebase/firestore";
 
 export default function Home() {
   const router = useRouter();
@@ -17,10 +18,20 @@ export default function Home() {
     const googleProvider = new GoogleAuthProvider();
 
     try {
-      signInWithPopup(auth, googleProvider); // trigger google auth modal
+      const result = await signInWithPopup(auth, googleProvider); // trigger google auth modal
+      const user = result.user;
 
-      // get the data for only that user
-      // const q = query(collection(db, "users"), where("uid", "==", user.uid));
+      // add user to the users collection
+      const userDocRef = doc(collection(db, "users"), user.uid);
+      await setDoc(
+        userDocRef,
+        {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+        },
+        { merge: true }
+      );
 
       router.push("/notes");
     } catch (error) {

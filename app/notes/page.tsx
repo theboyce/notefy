@@ -34,7 +34,6 @@ const Notes = () => {
 
   // destructure what we need from the firebase hook
   const [user] = useAuthState(auth);
-  // const { displayName, email, uid } = user;
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -101,6 +100,7 @@ const Notes = () => {
     try {
       setLoading(true);
       await addDoc(notesCollectionRef, {
+        uid: user?.uid,
         title,
         content,
         createdAt: serverTimestamp(),
