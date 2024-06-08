@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   collection,
   doc,
@@ -13,17 +13,55 @@ import {
   orderBy,
   query,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { auth, db } from "../firebase";
 import Link from "next/link";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { useAuthState } from "react-firebase-hooks/auth";
+import ProtectedRoute from "../ProtectedRoute";
+import { toast } from "sonner";
+
+// structure of each note
+interface Note {
+  id: string;
+  title: string;
+  content: string;
+  createdAt?: any; // Adjust type as needed
+}
 
 const Notes = () => {
+  const router = useRouter();
+
+  // destructure what we need from the firebase hook
+  const [user] = useAuthState(auth);
+  // const { displayName, email, uid } = user;
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // handle sign out
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      // router.push("/");
+      console.log("User signed out");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // handle current user state
+  const authChangeHandler = () => {
+    onAuthStateChanged(auth, (user) => {
+      console.log(user);
+    });
+  };
+
   const notesCollectionRef = collection(db, "notes"); // from the db, get 'notes'
+
   // getting all the notes
   const fetchNotes = async () => {
     try {
@@ -35,7 +73,7 @@ const Notes = () => {
           const notesList = snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
-          }));
+          })) as Note[];
           setNotes(notesList);
           setLoading(false);
         },
@@ -55,6 +93,11 @@ const Notes = () => {
 
   //   adding a new note
   const addNote = async () => {
+    if (!title || !content) {
+      toast.error("Please complete all fields");
+      return;
+    }
+
     try {
       setLoading(true);
       await addDoc(notesCollectionRef, {
@@ -62,6 +105,7 @@ const Notes = () => {
         content,
         createdAt: serverTimestamp(),
       });
+      toast.success("Note added");
       setTitle("");
       setContent("");
       setLoading(false);
@@ -77,60 +121,84 @@ const Notes = () => {
     try {
       const noteDocRef = doc(db, "notes", noteId);
       await deleteDoc(noteDocRef);
-      console.log(`Document with ID ${noteId} deleted successfully`);
-    } catch (e) {
-      console.error("Error deleting document: ", e);
+      toast.success(`Note ${noteId} deleted!`);
+    } catch (error) {
+      console.log("Error deleting document: ", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    // addNote();
-    fetchNotes();
-    // deleteNote("");
+    if (!loading) {
+      fetchNotes();
+    }
   }, []);
 
   return (
-    <div>
-      <h1>Notes</h1>
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Enter title"
-        className="text-black"
-      />
-      <br />
-      <textarea
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder="Enter content"
-        className="text-black"
-      ></textarea>
-      <br />
-      <button onClick={addNote}>Add Note</button>
-      {/* output notes here - use a diff component */}
+    <ProtectedRoute>
+      <h1>Display Notes Page</h1>
+
+      {/* add note */}
+      <form action={addNote}>
+        <input
+          id="title"
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter title"
+          className="text-black border-2 border-gray-200 p-2"
+        />
+        <br />
+        <textarea
+          id="content"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Enter content"
+          className="text-black border-2 border-gray-200 p-2"
+        ></textarea>
+        <br />
+        <button
+          type="submit"
+          aria-disabled={loading}
+          className="bg-gray-700 text-white"
+        >
+          Add Note
+        </button>
+      </form>
+
+      {/* TODO output notes here - use a diff component */}
       {loading ? (
         <div>Loading...</div>
       ) : !notes.length ? (
         <div>No notes found</div>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-x-2 space-y-2">
           {notes.map((note) => (
-            <li key={note.id} className="bg-slate-800">
+            <li
+              key={note.id}
+              className="bg-blue-800 text-white inline-block p-2"
+            >
               {/* go [noteId] in the catch-all routes */}
               <Link href={`/notes/${note.id}`}>
-                <p>ID: {note.id}</p>
                 <p>Title: {note.title}</p>
                 <p>Content: {note.content}</p>
-                <button onClick={() => deleteNote(note.id)}>Delete</button>
               </Link>
+              <button
+                onClick={() => deleteNote(note.id)}
+                className="bg-red-400"
+              >
+                Delete
+              </button>
             </li>
           ))}
         </ul>
       )}
-    </div>
+      {/* logout */}
+      <button onClick={handleSignOut} className="bg-red-400">
+        sign out
+      </button>
+    </ProtectedRoute>
   );
 };
 

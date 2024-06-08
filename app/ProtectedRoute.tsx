@@ -1,27 +1,29 @@
-// "use client";
-// import React, { useEffect } from "react";
-// import { useRouter } from "next/navigation";
-// import { useAuthState } from "react-firebase-hooks/auth";
-// import { auth } from "./firebase";
+"use client";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "./firebase";
 
-// const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-//   const [user, loading] = useAuthState(auth);
-//   const router = useRouter();
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const [user, loading] = useAuthState(auth);
+  const router = useRouter();
 
-//   useEffect(() => {
-//     const checkAuthentication = async () => {
-//       if (!loading) {
-//         if (!user) {
-//           // Redirect to the home page if the user is not authenticated
-//           router.push("/");
-//         }
-//       }
-//     };
+  //   console.log("user proptected" + user);
 
-//     checkAuthentication();
-//   }, [loading, user, router]);
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      if (!loading) {
+        if (!user) {
+          // redirect to the home page if the user is not authenticated
+          router.push("/");
+        }
+      }
+    };
 
-//   return <>{children}</>;
-// };
+    checkAuthentication();
+  }, [loading, user, router]);
 
-// export default ProtectedRoute;
+  return <>{children}</>;
+};
+
+export default ProtectedRoute;
