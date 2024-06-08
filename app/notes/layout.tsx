@@ -7,7 +7,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className=" flex bg-gray-100 gap-4">
+    <section className="flex bg-gray-100 gap-4">
       {/* Include shared UI here e.g. a header or sidebar */}
       <Navbar />
 

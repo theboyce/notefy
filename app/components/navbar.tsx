@@ -1,23 +1,43 @@
+"use client";
+
 import Link from "next/link";
-import React from "react";
+import Image from "next/image";
+
 import { FaPlus } from "react-icons/fa6";
 import { PiNotebookBold } from "react-icons/pi";
 import { TbTrash } from "react-icons/tb";
 import { PiMusicNotesPlusBold } from "react-icons/pi";
 import { TbSettings } from "react-icons/tb";
 import { LuLogOut } from "react-icons/lu";
-import Logo from "/images/logo.svg";
-import Image from "next/image";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../firebase";
+import { signOut } from "firebase/auth";
+import { toast } from "sonner";
 
 export default function Navbar() {
+  const [user] = useAuthState(auth);
+
+  console.log(user?.email);
+  console.log(user?.displayName);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      // router.push("/");
+      toast.success("User signed out");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
-    <div className="h-screen w-[20%] static flex flex-col justify-between bg-white px-4 py-8">
-      <div className="flex flex-col  gap-12">
+    <div className="h-screen min-w-[20%] static flex flex-col justify-between bg-white px-4 py-8">
+      <div className="flex flex-col gap-12">
         <Image
           src={"images/logo.svg"}
           width={142}
           height={32}
-          alt="logo image"
+          alt="Notefy logo"
         />
         {/* navbar links */}
         <div className="flex flex-col gap-2">
@@ -74,10 +94,12 @@ export default function Navbar() {
         {/* user details with logout */}
         <div className="flex items-center justify-between py-6 border-t">
           <div className="flex flex-col gap-1">
-            <p className="text-[14px] font-regular">Ibrahim Saddidk</p>
-            <p className="text-[12px] font-light">abubakasaddik1@gmail.com</p>
+            <p className="text-[14px] font-regular">ibrahim saddik</p>
+            <p className="text-[12px] font-light">ibrahim saddik</p>
           </div>
-          <LuLogOut size={18} />
+          <button onClick={handleSignOut}>
+            <LuLogOut size={18} />
+          </button>
         </div>
       </div>
     </div>
