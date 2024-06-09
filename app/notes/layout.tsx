@@ -14,7 +14,7 @@ export default function DashboardLayout({
       {/* initialize toast here */}
       <Toaster />
 
-      {children}
+      <div className="flex-1 p-8">{children}</div>
     </section>
   );
 }

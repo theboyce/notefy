@@ -22,6 +22,7 @@ export const addNote = async (prev: any, newNoteData: FormData) => {
   const newNote = {
     title: newNoteData.get("title"),
     content: newNoteData.get("content"),
+    // TODO : include the user's uid to the note
   };
 
   // call our db to insert the newNote
