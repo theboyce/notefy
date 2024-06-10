@@ -20,7 +20,7 @@ export default function NoNotes() {
 
       <Link
         href={"/notes/addnote/"}
-        className="bg-primary flex items-center gap-1 text-white py-2 px-4 rounded-md"
+        className="bg-primary hover:bg-primary/90 flex items-center gap-1 text-white py-2 px-4 rounded-md"
       >
         <FaPlus size={16} />
         Add a note

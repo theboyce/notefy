@@ -30,6 +30,7 @@ interface Note {
   title: string;
   content: string;
   createdAt?: any;
+  deleted?: boolean;
 }
 
 export default function Notes() {
@@ -41,6 +42,7 @@ export default function Notes() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [view, setView] = useState("grid");
 
   // from the db, get 'notes' collection
   const notesCollectionRef = collection(db, "notes");
@@ -50,6 +52,7 @@ export default function Notes() {
       const notesQuery = query(
         notesCollectionRef,
         where("uid", "==", user.uid), // only query notes for this user
+        where("deleted", "==", false), // only get notes which are deleted
         orderBy("createdAt", "desc")
       );
 
@@ -85,14 +88,14 @@ export default function Notes() {
   return (
     <ProtectedRoute>
       <div className="h-full space-y-4 flex flex-col">
-        <Header />
+        <Header headerType="greeting" />
 
         {/* search and display style */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 sm:gap-0">
           {/* search note */}
           <div className="flex-1">
             {notes.length > 0 ? (
-              <div className="p-2 flex gap-1 items-center justify-center border-2 border-gray-200 w-1/4 rounded-md">
+              <div className="p-2 flex gap-1 items-center justify-center border-2 border-gray-200 w-full sm:w-1/4 rounded-md">
                 <input
                   type="text"
                   placeholder="Search notes"
@@ -109,29 +112,34 @@ export default function Notes() {
             )}
           </div>
 
-          <div className="flex gap-2">
-            <span className="bg-secondary rounded-sm text-primary p-2">
+          <div className="flex gap-1 sm:gap-2">
+            <button className="bg-gray-200 rounded-sm text-primary p-2">
               <TbArrowsUpDown size={16} />
-            </span>
-            <span className="bg-secondary rounded-sm text-primary p-2">
+            </button>
+            {/* list */}
+            <button
+              className={`${view === "list" ? "bg-secondary" : "bg-gray-200"} rounded-sm text-primary p-2`}
+              onClick={() => setView("list")}
+            >
               <IoListSharp size={16} />
-            </span>
-            <span className="bg-secondary rounded-sm text-primary p-2">
+            </button>
+            {/* grid */}
+            <button
+              className={`${view === "grid" ? "bg-secondary" : "bg-gray-200"} rounded-sm text-primary p-2`}
+              onClick={() => setView("grid")}
+            >
               <BiSolidGridAlt size={16} />
-            </span>
+            </button>
           </div>
         </div>
 
-        {/* add note */}
-        {/* <AddNoteForm /> */}
-
-        <div className="flex-1">
+        <div className="overflow-auto flex-1">
           {loading ? (
             <div>Loading...</div>
           ) : notes?.length === 0 ? (
             <NoNotes />
           ) : (
-            <AllNotes notes={filteredNotes} />
+            <AllNotes notes={filteredNotes} view={view} />
           )}
         </div>
       </div>

@@ -30,11 +30,11 @@ export default function Navbar() {
   };
 
   return (
-    <div className="h-screen min-w-[20%] static flex flex-col justify-between bg-white px-4 py-8">
+    <div className="h-screen min-w-[20%] hidden sm:flex flex-col justify-between bg-white px-4 py-8">
       <div className="flex flex-col gap-12">
         <Link href={"/"}>
           <Image
-            src={"images/logo.svg"}
+            src={"/images/logo.svg"}
             width={142}
             height={32}
             alt="Notefy logo"
@@ -71,7 +71,7 @@ export default function Navbar() {
             Trash
           </Link>
           <Link
-            href={"/notes"}
+            href={"/notes/addplaylist"}
             className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-sm"
           >
             <span>
