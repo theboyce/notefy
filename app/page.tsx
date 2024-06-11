@@ -50,7 +50,7 @@ export default function Home() {
     <main className="h-screen bg-white flex flex-col px-8 py-6">
       <div className="font-bold">Notefy</div>
       <div className="flex flex-1 flex-col justify-center items-center gap-4">
-        <h2 className="font-bold text-[3rem] text-primary">
+        <h2 className="font-bold text-[3rem] text-primary text-center">
           Thoughts and Tunes Together
         </h2>
         <p className="text-blueGray">Keep your notes and playlists in sync</p>

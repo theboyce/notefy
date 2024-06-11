@@ -2,22 +2,25 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../firebase";
+import { signOut } from "firebase/auth";
+
+import { toast } from "sonner";
 import { FaPlus } from "react-icons/fa6";
 import { PiNotebookBold } from "react-icons/pi";
 import { TbTrash } from "react-icons/tb";
 import { PiMusicNotesPlusBold } from "react-icons/pi";
 import { TbSettings } from "react-icons/tb";
 import { LuLogOut } from "react-icons/lu";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../firebase";
-import { signOut } from "firebase/auth";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [user] = useAuthState(auth);
   const router = useRouter();
+  const pathname = usePathname();
+  console.log(pathname);
 
   const handleSignOut = async () => {
     try {
@@ -28,6 +31,29 @@ export default function Navbar() {
       console.log(error);
     }
   };
+
+  const navItems = [
+    {
+      icon: <FaPlus size={18} />,
+      name: "Create Note",
+      url: "/notes/addnote",
+    },
+    {
+      icon: <PiNotebookBold size={18} />,
+      name: "All Notes",
+      url: "/notes",
+    },
+    {
+      icon: <TbTrash size={18} />,
+      name: "Trash",
+      url: "/notes/trash",
+    },
+    {
+      icon: <PiMusicNotesPlusBold size={18} />,
+      name: "Add Playlist",
+      url: "/notes/addplaylist",
+    },
+  ];
 
   return (
     <div className="h-screen min-w-[20%] hidden sm:flex flex-col justify-between bg-white px-4 py-8">
@@ -43,42 +69,15 @@ export default function Navbar() {
 
         {/* navbar links */}
         <div className="flex flex-col gap-2">
-          <Link
-            href={"/notes/addnote"}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-sm"
-          >
-            <span>
-              <FaPlus size={18} />
-            </span>{" "}
-            Create Note
-          </Link>
-          <Link
-            href={"/notes"}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-sm"
-          >
-            <span>
-              <PiNotebookBold size={18} />
-            </span>
-            All Notes
-          </Link>
-          <Link
-            href={"/notes/trash"}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-sm"
-          >
-            <span>
-              <TbTrash size={18} />
-            </span>
-            Trash
-          </Link>
-          <Link
-            href={"/notes/addplaylist"}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-sm"
-          >
-            <span>
-              <PiMusicNotesPlusBold size={18} />
-            </span>
-            Add Playlist{" "}
-          </Link>
+          {navItems.map((item, i) => (
+            <Link
+              key={i}
+              href={item.url}
+              className={`flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-sm ${item.url === pathname ? "bg-secondary text-primary" : ""}`}
+            >
+              <span>{item.icon}</span> {item.name}
+            </Link>
+          ))}
         </div>
       </div>
       {/* buttom navigation and user details */}

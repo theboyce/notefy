@@ -14,7 +14,7 @@ import { toast } from "sonner";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
 
-const CustomToast = ({ message, title, content, type }: any) => {
+export const CustomToast = ({ message, title, content, type }: any) => {
   return (
     <div className="flex items-start justify-center gap-2">
       {type === "success" ? (
@@ -55,7 +55,23 @@ export default function AddNoteForm() {
   // add a new note
   const addNote = async () => {
     if (!title || !content) {
-      toast.error("Please complete all fields");
+      toast(
+        <CustomToast
+          message="Invalid Input"
+          title={"Please complete all fields"}
+          // content={content}
+          type="error"
+        />,
+        {
+          position: "top-center",
+          style: {
+            background: "white",
+            color: "#D92D20",
+            border: "2px solid #D92D20",
+          },
+          duration: 3000,
+        }
+      );
       return;
     }
 

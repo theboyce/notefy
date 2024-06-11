@@ -28,7 +28,7 @@ export default function AllNotes({ notes, view }: AllNotesProps) {
 
   return (
     <ul
-      className={`space-x-2 space-y-2 ${view === "grid" ? "grid grid-cols-1 sm:grid-cols-3 justify-center items-center" : "bg-blue-400 flex flex-col"}`}
+      className={`${view === "grid" ? "grid grid-cols-1 sm:grid-cols-3 gap-2 justify-center items-center" : "flex flex-col gap-2"}`}
     >
       {notes?.map((note) => (
         // each card

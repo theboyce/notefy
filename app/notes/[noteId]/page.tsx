@@ -2,14 +2,13 @@
 
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { db } from "@/app/firebase";
 import {
   doc,
   collection,
   deleteDoc,
-  onSnapshot,
   updateDoc,
   getDoc,
 } from "firebase/firestore";
@@ -21,6 +20,7 @@ import dynamic from "next/dynamic";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
 import Header from "@/app/components/header";
+import { CustomToast } from "../addnote/AddNoteForm";
 
 interface Note {
   id: string;
@@ -82,6 +82,22 @@ export default function NoteDetails({ params }: any) {
       });
       // fetch after updating the note
       await getNoteById(noteId);
+      toast(
+        <CustomToast
+          message="Note saved"
+          title={"Note successfully updated"}
+          type="success"
+        />,
+        {
+          position: "top-center",
+          style: {
+            background: "white",
+            color: "green",
+            border: "2px solid #75e0a7",
+          },
+          duration: 3000,
+        }
+      );
       setEditMode(false);
     } catch (error) {
       console.error("Error updating document: ", error);
@@ -101,7 +117,22 @@ export default function NoteDetails({ params }: any) {
       const noteDocRef = doc(notesCollectionRef, noteId);
       await deleteDoc(noteDocRef);
       router.back();
-      toast.success(`Note ${noteId} deleted!`);
+      toast(
+        <CustomToast
+          message="Note deleted"
+          title={`Note ${noteId} deleted!`}
+          type="error"
+        />,
+        {
+          position: "top-center",
+          style: {
+            background: "white",
+            color: "#D92D20",
+            border: "2px solid #D92D20",
+          },
+          duration: 3000,
+        }
+      );
     } catch (error) {
       console.log("Error deleting document: ", error);
     } finally {
@@ -114,9 +145,26 @@ export default function NoteDetails({ params }: any) {
     try {
       setLoading(true);
       const noteDocRef = doc(notesCollectionRef, noteId);
-      await updateDoc(noteDocRef, { deleted: true }); // Mark the note as deleted
+      await updateDoc(noteDocRef, { deleted: true }); // mark the note as deleted
       router.back();
-      toast.success(`Note ${noteId} moved to trash!`);
+      // toast.success(`Note ${noteId} moved to trash!`);
+      toast(
+        <CustomToast
+          message="Moved to trash"
+          title={`Note ${noteId} moved to trash!`}
+          // content={content}
+          type="success"
+        />,
+        {
+          position: "top-center",
+          style: {
+            background: "white",
+            color: "green",
+            border: "2px solid #75e0a7",
+          },
+          duration: 3000,
+        }
+      );
     } catch (error) {
       console.error("Error deleting note:", error);
       toast.error("Failed to move note to trash");
@@ -143,66 +191,83 @@ export default function NoteDetails({ params }: any) {
   return (
     <div className="flex flex-col h-full">
       {/* heading */}
-      <Header headerType="editNote" />
+      <Header headerType={editMode ? "editNote" : "noteDetails"} />
 
       {/* content */}
       {noteDetails ? (
         <>
           {/* display edit mode */}
           {editMode ? (
-            <div>
-              <input
-                type="text"
-                value={editedTitle}
-                onChange={(e) => setEditedTitle(e.target.value)}
-                placeholder="Enter title"
-                className="text-black"
-              />
-              <br />
-              {/* ReactQuill for rich text editing */}
-              <ReactQuill
-                value={editedContent}
-                onChange={setEditedContent}
-                placeholder="Enter content"
-                className="text-black"
-              />
-              <br />
-              <button onClick={() => editNote(noteId)}>Save</button>
-              <button onClick={() => setEditMode(false)}>Cancel</button>
+            <div className="h-full flex flex-col pt-4">
+              <div className="flex-1 space-y-4">
+                <input
+                  type="text"
+                  value={editedTitle}
+                  onChange={(e) => setEditedTitle(e.target.value)}
+                  placeholder="Enter title"
+                  className="text-black"
+                />
+                {/* ReactQuill for rich text editing */}
+                <ReactQuill
+                  value={editedContent}
+                  onChange={setEditedContent}
+                  placeholder="Enter content"
+                  className="text-black"
+                />
+              </div>
+              <div className="pb-12 flex gap-2 justify-center">
+                <button
+                  onClick={() => editNote(noteId)}
+                  className="py-2 px-4 rounded-md text-white bg-blue-700"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setEditMode(false)}
+                  className="py-2 px-4 rounded-md text-darKBlue border border-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           ) : (
             // display the note details
-            <div className="bg-red-200 flex-1">
-              <h3 className="text-lg font-bold">{noteDetails.title}</h3>
-              <div
-                dangerouslySetInnerHTML={{ __html: noteDetails.content }}
-                className="text-lg"
-              ></div>
+            <div className="flex-1 flex flex-col pt-4">
+              <div className="flex-1 overflow-auto">
+                <h3 className="text-2xl font-bold underline">
+                  {noteDetails.title}
+                </h3>
+                <div
+                  dangerouslySetInnerHTML={{ __html: noteDetails.content }}
+                  className="text-lg"
+                ></div>
+              </div>
+
               {/* buttons */}
-              <div className="flex gap-2">
+              <div className="flex justify-center gap-2 pb-12">
                 <button
-                  onClick={() => router.push("/notes")}
-                  className="bg-green-400"
+                  onClick={() => router.back()}
+                  className="py-2 px-4 rounded-md text-white bg-green-700"
                 >
                   Done
                 </button>
                 <button
                   onClick={() => setEditMode(true)}
-                  className="bg-blue-400"
+                  className="py-2 px-4 rounded-md text-white bg-blue-700"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => moveToTrash(noteId)}
-                  className="bg-yellow-400"
+                  className="py-2 px-4 rounded-md text-white bg-yellow-500"
                 >
                   Move to trash
                 </button>
                 <button
                   onClick={() => deleteNote(noteId)}
-                  className="bg-red-400"
+                  className="py-2 px-4 rounded-md text-white bg-red-600"
                 >
-                  Delete permanently
+                  Delete
                 </button>
               </div>
             </div>
