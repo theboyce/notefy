@@ -20,7 +20,6 @@ export default function Navbar() {
   const [user] = useAuthState(auth);
   const router = useRouter();
   const pathname = usePathname();
-  console.log(pathname);
 
   const handleSignOut = async () => {
     try {

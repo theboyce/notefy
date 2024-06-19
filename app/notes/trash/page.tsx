@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import Header from "@/app/components/header";
 import { CustomToast } from "../addnote/AddNoteForm";
+import NoNotes from "../NoNotes";
 
 // structure of each note
 interface Note {
@@ -105,36 +106,72 @@ export default function Trash() {
       <ul
         className={`grid grid-cols-1 sm:grid-cols-3 gap-2 justify-center items-center`}
       >
-        {deletedNotes?.map((note) => (
-          // each card
-          <li
-            key={note.id}
-            className="border border-gray-300 text-darkGray inline-block p-3 h-[160px] rounded-md bg-white hover:bg-gray-100 overflow-hidden space-y-2"
-          >
-            {/* go [noteId] in the catch-all routes */}
-            <Link href={`/notes/${note.id}`} className="flex flex-col">
-              <p className="font-bold text-lg pb-2 border-b border-gray-200">
-                {note.title}
-              </p>
-
-              {/* retain the rich text formatting */}
-              <div className="flex justify-between items-center border-t border-gray-200 pt-2">
-                <div
-                  dangerouslySetInnerHTML={{ __html: note.content }}
-                  className="truncate text-blueGray h-[50px] overflow-hidden flex-1"
-                ></div>
-                <div className="h-2 w-4 bg-red-500 rounded-full">&nbsp;</div>
-              </div>
-            </Link>
-            <button
-              onClick={() => restoreNote(note.id)}
-              className="p-2 text-sm float-right rounded-md text-white bg-green-700"
+        {loading ? (
+          <div>Loading...</div>
+        ) : deletedNotes?.length === 0 ? (
+          <div>There&apos;s nothing here...</div>
+        ) : (
+          deletedNotes?.map((note) => (
+            // each card
+            <li
+              key={note.id}
+              className="border border-gray-300 text-darkGray inline-block p-3 h-[160px] rounded-md bg-white hover:bg-gray-100 overflow-hidden space-y-2"
             >
-              Restore
-            </button>
-          </li>
-        ))}
+              {/* go [noteId] in the catch-all routes */}
+              <Link href={`/notes/${note.id}`} className="flex flex-col">
+                <p className="font-bold text-lg pb-2 border-b border-gray-200">
+                  {note.title}
+                </p>
+
+                {/* retain the rich text formatting */}
+                <div className="flex justify-between items-center border-t border-gray-200 pt-2">
+                  <div
+                    dangerouslySetInnerHTML={{ __html: note.content }}
+                    className="truncate text-blueGray h-[50px] overflow-hidden flex-1"
+                  ></div>
+                  <div className="h-2 w-4 bg-red-500 rounded-full">&nbsp;</div>
+                </div>
+              </Link>
+              <button
+                onClick={() => restoreNote(note.id)}
+                className="p-2 text-sm float-right rounded-md text-white bg-green-700"
+              >
+                Restore
+              </button>
+            </li>
+          ))
+        )}
       </ul>
     </div>
   );
 }
+
+// {deletedNotes?.map((note) => (
+//   // each card
+//   <li
+//     key={note.id}
+//     className="border border-gray-300 text-darkGray inline-block p-3 h-[160px] rounded-md bg-white hover:bg-gray-100 overflow-hidden space-y-2"
+//   >
+//     {/* go [noteId] in the catch-all routes */}
+//     <Link href={`/notes/${note.id}`} className="flex flex-col">
+//       <p className="font-bold text-lg pb-2 border-b border-gray-200">
+//         {note.title}
+//       </p>
+
+//       {/* retain the rich text formatting */}
+//       <div className="flex justify-between items-center border-t border-gray-200 pt-2">
+//         <div
+//           dangerouslySetInnerHTML={{ __html: note.content }}
+//           className="truncate text-blueGray h-[50px] overflow-hidden flex-1"
+//         ></div>
+//         <div className="h-2 w-4 bg-red-500 rounded-full">&nbsp;</div>
+//       </div>
+//     </Link>
+//     <button
+//       onClick={() => restoreNote(note.id)}
+//       className="p-2 text-sm float-right rounded-md text-white bg-green-700"
+//     >
+//       Restore
+//     </button>
+//   </li>
+// ))}
