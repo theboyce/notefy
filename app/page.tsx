@@ -128,10 +128,14 @@ export default function Home() {
       toast.success("Sign-in successful!");
       router.push("/notes");
     } catch (error: unknown) {
-      if (error.message === "Firebase: Error (auth/invalid-credential).") {
-        toast.error("Invalid credentials");
+      if (error instanceof Error) {
+        if (error.message === "Firebase: Error (auth/invalid-credential).") {
+          toast.error("Invalid credentials");
+        } else {
+          toast.error("An internal error occurred");
+        }
       } else {
-        toast.error("An internal error occured");
+        toast.error("An unknown error occurred");
       }
     } finally {
       setLoading(false);
