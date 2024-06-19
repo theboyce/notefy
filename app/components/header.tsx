@@ -21,7 +21,7 @@ export default function Header({ headerType }: HeaderProps) {
           <section className="flex justify-between items-center">
             <div className="space-y-2">
               <span className="text-2xl font-medium">
-                Hello, {user?.displayName}
+                Hello, {user?.displayName || "User"}
               </span>
               <p className="text-gray-500">What&apos;s on your mind today?</p>
             </div>

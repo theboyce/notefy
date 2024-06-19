@@ -25,7 +25,7 @@ export default function Navbar() {
     try {
       await signOut(auth);
       router.push("/");
-      toast.success("User signed out");
+      toast.success("Sign out success");
     } catch (error) {
       console.log(error);
     }
@@ -58,14 +58,10 @@ export default function Navbar() {
     <div className="h-screen min-w-[20%] hidden sm:flex flex-col justify-between bg-white px-4 py-8">
       <div className="flex flex-col gap-12">
         <Link href={"/"}>
-          <Image
-            src={"/images/logo.svg"}
-            width={142}
-            height={32}
-            alt="Notefy logo"
-          />
+          <div className="relative w-[142px] h-[32px]">
+            <Image src={"/images/logo.svg"} fill alt="Notefy logo" />
+          </div>
         </Link>
-
         {/* navbar links */}
         <div className="flex flex-col gap-2">
           {navItems.map((item, i) => (
@@ -95,7 +91,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between py-6 border-t">
           <div className="flex flex-col gap-1">
             <span className="text-[14px] font-regular">
-              {user?.displayName}
+              {user?.displayName || "User"}
             </span>
             <span className="text-[12px] font-light">{user?.email}</span>
           </div>
