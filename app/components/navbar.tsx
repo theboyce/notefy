@@ -96,8 +96,10 @@ export default function Navbar() {
         {/* user details with logout */}
         <div className="flex items-center justify-between py-6 border-t">
           <div className="flex flex-col gap-1">
-            <p className="text-[14px] font-regular">ibrahim saddik</p>
-            <p className="text-[12px] font-light">ibrahim saddik</p>
+            <span className="text-[14px] font-regular">
+              {user?.displayName}
+            </span>
+            <span className="text-[12px] font-light">{user?.email}</span>
           </div>
           <button onClick={handleSignOut}>
             <LuLogOut size={18} />
