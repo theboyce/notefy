@@ -13,17 +13,16 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [user] = useAuthState(auth);
-
-  console.log(user?.email);
-  console.log(user?.displayName);
+  const router = useRouter();
 
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      // router.push("/");
+      router.push("/");
       toast.success("User signed out");
     } catch (error) {
       console.log(error);
@@ -31,18 +30,21 @@ export default function Navbar() {
   };
 
   return (
-    <div className="h-screen min-w-[20%] static flex flex-col justify-between bg-white px-4 py-8">
+    <div className="h-screen min-w-[20%] hidden sm:flex flex-col justify-between bg-white px-4 py-8">
       <div className="flex flex-col gap-12">
-        <Image
-          src={"images/logo.svg"}
-          width={142}
-          height={32}
-          alt="Notefy logo"
-        />
+        <Link href={"/"}>
+          <Image
+            src={"/images/logo.svg"}
+            width={142}
+            height={32}
+            alt="Notefy logo"
+          />
+        </Link>
+
         {/* navbar links */}
         <div className="flex flex-col gap-2">
           <Link
-            href={"/notes"}
+            href={"/notes/addnote"}
             className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-sm"
           >
             <span>
@@ -60,7 +62,7 @@ export default function Navbar() {
             All Notes
           </Link>
           <Link
-            href={"/notes"}
+            href={"/notes/trash"}
             className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-sm"
           >
             <span>
@@ -69,7 +71,7 @@ export default function Navbar() {
             Trash
           </Link>
           <Link
-            href={"/notes"}
+            href={"/notes/addplaylist"}
             className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-sm"
           >
             <span>
@@ -93,14 +95,9 @@ export default function Navbar() {
 
         {/* user details with logout */}
         <div className="flex items-center justify-between py-6 border-t">
-          <div className="flex items-center gap-2">
-            <div className="h-[40px] w-[40px] bg-black rounded-full"></div>
-            <div className="flex flex-col gap-1">
-              <p className="text-[16px] font-regular">{user?.displayName}</p>
-              <p className="text-[14px] font-light truncate">
-                kwabenaadofo330@gmail.com
-              </p>
-            </div>
+          <div className="flex flex-col gap-1">
+            <p className="text-[14px] font-regular">ibrahim saddik</p>
+            <p className="text-[12px] font-light">ibrahim saddik</p>
           </div>
           <button onClick={handleSignOut}>
             <LuLogOut size={18} />
